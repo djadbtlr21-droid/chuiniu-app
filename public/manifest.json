@@ -1,6 +1,6 @@
 {
-  "name": "Chuiniu",
-  "short_name": "Chuiniu",
+  "name": "Chuiniu - 吹牛",
+  "short_name": "吹牛",
   "description": "Liar Dice for Yiwu drinking tables",
   "start_url": "/",
   "display": "standalone",
@@ -8,7 +8,7 @@
   "background_color": "#0A0606",
   "theme_color": "#C8102E",
   "icons": [
-    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+    { "src": "/icons/icon-192.svg", "sizes": "192x192", "type": "image/svg+xml" },
+    { "src": "/icons/icon-512.svg", "sizes": "512x512", "type": "image/svg+xml" }
   ]
 }
