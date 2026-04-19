@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#0A0606"/>
+  <rect x="16" y="16" width="480" height="480" rx="48" fill="none" stroke="#D4AF37" stroke-width="3" opacity="0.3"/>
+  <text x="256" y="340" font-size="300" text-anchor="middle" fill="#D4AF37" font-family="serif" font-weight="bold">吹</text>
+  <text x="256" y="430" font-size="48" text-anchor="middle" fill="#A89080" font-family="sans-serif" letter-spacing="6">CHUINIU</text>
+</svg>

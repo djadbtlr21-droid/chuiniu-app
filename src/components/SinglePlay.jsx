@@ -183,15 +183,14 @@ export default function SinglePlay({ rules, onBack }) {
   /* ── Shake / Shuffle ── */
   const handleShake = useCallback(() => {
     if (phase !== 'playing' || rolling) return;
-    setRolling(true);
+    // Generate new values FIRST so they display during animation
+    setPlayerDice(rollDice(5));
+    setBotDice(rollDice(5));
     setClusterKey(Date.now());
+    setRolling(true);
     playDiceShuffle();
     if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
-    setTimeout(() => {
-      setPlayerDice(rollDice(5));
-      setBotDice(rollDice(5));
-      setRolling(false);
-    }, 1500);
+    setTimeout(() => setRolling(false), 1500);
   }, [phase, rolling]);
 
   useShakeDetection(handleShake, phase === 'playing');

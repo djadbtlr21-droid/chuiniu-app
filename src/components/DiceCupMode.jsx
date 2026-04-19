@@ -69,15 +69,12 @@ export default function DiceCupMode({ rules, onBack }) {
 
   const doShuffle = useCallback(() => {
     if (rolling) return;
-    setRolling(true);
+    setDice(rollDice(5));
     setClusterKey(Date.now());
+    setRolling(true);
     playDiceShuffle();
     if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
-
-    setTimeout(() => {
-      setDice(rollDice(5));
-      setRolling(false);
-    }, 1500);
+    setTimeout(() => setRolling(false), 1500);
   }, [rolling]);
 
   useShakeDetection(doShuffle, true);
