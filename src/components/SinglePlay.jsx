@@ -180,14 +180,18 @@ export default function SinglePlay({ rules, onBack }) {
     if (phase === 'rolling') startRound();
   }, [phase, startRound]);
 
-  /* ── Shake ── */
+  /* ── Shake / Shuffle ── */
   const handleShake = useCallback(() => {
     if (phase !== 'playing' || rolling) return;
     setRolling(true);
     setClusterKey(Date.now());
     playDiceShuffle();
     if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
-    setTimeout(() => setRolling(false), 1500);
+    setTimeout(() => {
+      setPlayerDice(rollDice(5));
+      setBotDice(rollDice(5));
+      setRolling(false);
+    }, 1500);
   }, [phase, rolling]);
 
   useShakeDetection(handleShake, phase === 'playing');
