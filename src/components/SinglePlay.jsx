@@ -9,6 +9,8 @@ import Button from './Button';
 import Die from './Die';
 import DiceCluster from './DiceCluster';
 import DiceSortedCount from './DiceSortedCount';
+import WinCelebration from './WinCelebration';
+import LoseEffect from './LoseEffect';
 
 /* ── Result Die with optional highlight ── */
 function ResultDie({ value, callValue, wildOn, wildActive, size = 48, staggerIndex = 0 }) {
@@ -395,75 +397,89 @@ export default function SinglePlay({ rules, onBack }) {
       </main>
 
       {/* ═══════ Result overlay ═══════ */}
-      {phase === 'result' && roundResult && (
-        <div className="fixed inset-0 bg-black/75 flex items-center justify-center z-50 p-4">
-          <div className="bg-bg-surface border border-accent-gold/20 rounded-xl p-5 max-w-sm w-full gold-border-frame overflow-y-auto max-h-[90vh]">
-            <h3 className="text-accent-gold font-title text-xl text-center mb-4">
-              {t('singlePlay.challengeResult')}
-            </h3>
+      {phase === 'result' && roundResult && (() => {
+        const playerWon = roundResult.loser !== 'player';
+        return (
+          <>
+            {playerWon && <WinCelebration />}
+            {!playerWon && <LoseEffect />}
 
-            {/* AI dice row — highlighted */}
-            <div className="mb-3">
-              <p className="text-text-muted text-xs mb-1.5 uppercase tracking-wider">{t('singlePlay.opponentDice')}</p>
-              <div className="flex gap-2 justify-center">
-                {botDice.map((v, i) => (
-                  <ResultDie key={i} value={v} callValue={roundResult.call.value}
-                    wildOn={wildOn} wildActive={roundResult.wildActive} size={48} staggerIndex={i} />
-                ))}
+            <div className="fixed inset-0 bg-black/75 flex items-center justify-center z-50 p-4">
+              <div className={`bg-bg-surface border border-accent-gold/20 rounded-xl p-5 max-w-sm w-full gold-border-frame overflow-y-auto max-h-[90vh] ${
+                playerWon ? 'win-border-pulse' : 'lose-shake lose-border-pulse'
+              }`}>
+                <h3 className="text-accent-gold font-title text-xl text-center mb-4">
+                  {t('singlePlay.challengeResult')}
+                </h3>
+
+                {/* AI dice row */}
+                <div className="mb-3">
+                  <p className="text-text-muted text-xs mb-1.5 uppercase tracking-wider">{t('singlePlay.opponentDice')}</p>
+                  <div className="flex gap-2 justify-center">
+                    {botDice.map((v, i) => (
+                      <ResultDie key={i} value={v} callValue={roundResult.call.value}
+                        wildOn={wildOn} wildActive={roundResult.wildActive} size={48} staggerIndex={i} />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Player dice row */}
+                <div className="mb-3">
+                  <p className="text-text-muted text-xs mb-1.5 uppercase tracking-wider">{t('singlePlay.myDice')}</p>
+                  <div className="flex gap-2 justify-center">
+                    {playerDice.map((v, i) => (
+                      <ResultDie key={i} value={v} callValue={roundResult.call.value}
+                        wildOn={wildOn} wildActive={roundResult.wildActive} size={48} staggerIndex={i + 5} />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Combined count */}
+                <div className="mb-4 pt-3 border-t border-accent-gold/10">
+                  <p className="text-text-muted text-xs mb-1.5 uppercase tracking-wider text-center">{t('singlePlay.totalCount')}</p>
+                  <DiceSortedCount dice={roundResult.allDice}
+                    highlightValue={roundResult.call.value}
+                    wildOn={wildOn} wildActive={roundResult.wildActive} />
+                </div>
+
+                {/* Call vs actual */}
+                <div className="text-center mb-4 py-3 border-t border-accent-gold/10">
+                  <p className="text-text-secondary text-sm">
+                    {t('singlePlay.theCall')}: {roundResult.call.count} x {roundResult.call.value}
+                  </p>
+                  <p className="text-text-secondary text-sm">
+                    {t('singlePlay.actualCount')}: {roundResult.call.value}{' '}
+                    → {allDiceCounts[roundResult.call.value] || 0}{t('singlePlay.countUnit')}
+                    {wildOn && roundResult.wildActive && roundResult.call.value !== 1 && (
+                      <span className="text-text-muted"> (+1: {allDiceCounts[1] || 0})</span>
+                    )}
+                  </p>
+                </div>
+
+                {/* Win/Lose text */}
+                <div className="text-center mb-5">
+                  {playerWon ? (
+                    <p className="text-3xl font-bold font-title win-text-pulse" style={{ color: '#10B981' }}>
+                      {t('singlePlay.youWin')}
+                    </p>
+                  ) : (
+                    <p className="text-2xl font-bold" style={{ color: '#C8102E' }}>
+                      {t('singlePlay.youLose')}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex gap-2">
+                  <Button fullWidth size="lg" onClick={nextRound}>{t('singlePlay.nextRound')}</Button>
+                  <Button variant="ghost" size="sm" onClick={onBack} className="flex-shrink-0 text-sm px-3">
+                    {t('singlePlay.show')}
+                  </Button>
+                </div>
               </div>
             </div>
-
-            {/* Player dice row — highlighted */}
-            <div className="mb-3">
-              <p className="text-text-muted text-xs mb-1.5 uppercase tracking-wider">{t('singlePlay.myDice')}</p>
-              <div className="flex gap-2 justify-center">
-                {playerDice.map((v, i) => (
-                  <ResultDie key={i} value={v} callValue={roundResult.call.value}
-                    wildOn={wildOn} wildActive={roundResult.wildActive} size={48} staggerIndex={i + 5} />
-                ))}
-              </div>
-            </div>
-
-            {/* Combined count — highlighted */}
-            <div className="mb-4 pt-3 border-t border-accent-gold/10">
-              <p className="text-text-muted text-xs mb-1.5 uppercase tracking-wider text-center">{t('singlePlay.totalCount')}</p>
-              <DiceSortedCount dice={roundResult.allDice}
-                highlightValue={roundResult.call.value}
-                wildOn={wildOn} wildActive={roundResult.wildActive} />
-            </div>
-
-            {/* Call vs actual */}
-            <div className="text-center mb-4 py-3 border-t border-accent-gold/10">
-              <p className="text-text-secondary text-sm">
-                {t('singlePlay.theCall')}: {roundResult.call.count} x {roundResult.call.value}
-              </p>
-              <p className="text-text-secondary text-sm">
-                {t('singlePlay.actualCount')}: {roundResult.call.value}{' '}
-                → {allDiceCounts[roundResult.call.value] || 0}{t('singlePlay.countUnit')}
-                {wildOn && roundResult.wildActive && roundResult.call.value !== 1 && (
-                  <span className="text-text-muted"> (+1: {allDiceCounts[1] || 0})</span>
-                )}
-              </p>
-            </div>
-
-            {/* Win/Lose */}
-            <div className="text-center mb-5">
-              {roundResult.loser !== 'player' ? (
-                <p className="text-3xl font-bold text-accent-gold gold-glow font-title">{t('singlePlay.youWin')}</p>
-              ) : (
-                <p className="text-2xl font-bold text-accent-red">{t('singlePlay.youLose')}</p>
-              )}
-            </div>
-
-            <div className="flex gap-2">
-              <Button fullWidth size="lg" onClick={nextRound}>{t('singlePlay.nextRound')}</Button>
-              <Button variant="ghost" size="sm" onClick={onBack} className="flex-shrink-0 text-sm px-3">
-                {t('singlePlay.show')}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+          </>
+        );
+      })()}
     </div>
   );
 }
